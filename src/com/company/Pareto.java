@@ -184,8 +184,9 @@ public class Pareto {
         return mas1;
     }
 
-    public Pareto(ArrayList<Camera> mainMas) {
+    public Pareto(ArrayList<Camera> mas) {
 
+        ArrayList<Camera> mainMas = mas;
         ArrayList<Camera> parMas = new ArrayList<>();
         ArrayList<Camera> upMas = new ArrayList<>();
         ArrayList<Camera> upMasPar = new ArrayList<>();
