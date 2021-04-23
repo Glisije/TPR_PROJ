@@ -1,24 +1,40 @@
 package com.company;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Electra {
 
     public static void printElec(String[][] mat, ArrayList<Camera> mas){
+
+        double C;
+        String[][] mat1 = new String[10][10];
+
+        for (int i = 0; i < mat.length; i++) {
+            for (int j = 0; j < mat.length; j++) {
+                switch (mat[i][j]) {
+                    case " XXX " -> mat1[i][j] = "XXX";
+                    case "Infinity" -> mat1[i][j] = " ∞ ";
+                    case "null" -> mat1[i][j] = "---";
+                    default -> mat1[i][j] = String.format("%.3s", mat[i][j]);
+                }
+            }
+        }
+
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println("\t\t|  XT4  |  XT3  | XT30  |BMPCC6K|BMPCC4K| BMPCC |A7sIII | A7sII | A7sI  | a6600 |");
         System.out.println("-----------------------------------------------------------------------------------------");
-        for (int i = 0; i < mat.length; i++) {
+        for (int i = 0; i < mat1.length; i++) {
             System.out.print(mas.get(i).pName+"|");
-            for (int j = 0; j < mat[0].length; j++) {
-                System.out.print("   " + mat[i][j] + "  ");
+            for (int j = 0; j < mat1[0].length; j++) {
+                System.out.print("   " + mat1[i][j] + "  ");
             }
             System.out.println("|");
         }
         System.out.println("-----------------------------------------------------------------------------------------");
     }
 
-    public static String[][] electraMethod(ArrayList<Camera> mas) {
+    public static String[][] electraMethod(ArrayList<Camera> mas, double C) {
 
         String[][] mat = new String[10][10];
 
@@ -83,12 +99,13 @@ public class Electra {
                     mat[i][j] = "XXX";
                 } else {
                     try {
-                        mas.get(i).D = mas.get(i).P / mas.get(i).N;
-                        if (mas.get(i).D >= 1) {
+                        mas.get(i).D = (double) mas.get(i).P / (double) mas.get(i).N;
+                        if (mas.get(i).D >= C) {
                             mat[i][j] = ""+mas.get(i).D;
-                        } else if (mas.get(i).D < 1) {
+                        } else if (mas.get(i).D < C) {
                             mat[i][j] = "---";
                         }
+
                     } catch (ArithmeticException e){
                         mat[i][j] = "---";
                     }
@@ -98,14 +115,15 @@ public class Electra {
         return mat;
     }
 
-
-
     public Electra(ArrayList < Camera > mas) {
 
-            ArrayList<Camera> mainMas = mas;
-            String[][] mat = electraMethod(mainMas);
-            System.out.println("Метод Электра:");
-            printElec(mat, mainMas);
+        ArrayList<Camera> mainMas = mas;
+        String[][] mat = electraMethod(mainMas, 1);
+        System.out.println("Метод Электра:");
+        printElec(mat, mainMas);
+        System.out.println("Метод Электра с ограничением ("+ 2.3 +"):");
+        String[][] ogr = electraMethod(mainMas, 2.3);
+        printElec(ogr, mainMas);
     }
 
 }
