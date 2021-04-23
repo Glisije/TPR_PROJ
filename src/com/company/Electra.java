@@ -5,6 +5,19 @@ import java.util.ArrayList;
 
 public class Electra {
 
+    public static void printDomin(String[][] mat){
+
+        for (int i = 0; i < mat.length; i++) {
+            System.out.print(i+1+" -> ");
+            for (int j = 0; j < mat[0].length; j++) {
+                if (mat[i][j] != "---" && mat[i][j] != "XXX" ) {
+                    System.out.print(j+1+",");
+                }
+            }
+            System.out.println();
+        }
+    }
+
     public static void printElec(String[][] mat, ArrayList<Camera> mas){
 
         double C;
@@ -121,9 +134,11 @@ public class Electra {
         String[][] mat = electraMethod(mainMas, 1);
         System.out.println("Метод Электра:");
         printElec(mat, mainMas);
+        printDomin(mat);
         System.out.println("Метод Электра с ограничением ("+ 2.3 +"):");
         String[][] ogr = electraMethod(mainMas, 2.3);
         printElec(ogr, mainMas);
+        printDomin(ogr);
     }
 
 }
