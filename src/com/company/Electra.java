@@ -129,14 +129,16 @@ public class Electra {
     }
 
     public Electra(ArrayList < Camera > mas) {
-
+        double C;
         ArrayList<Camera> mainMas = mas;
-        String[][] mat = electraMethod(mainMas, 1);
+        C = 1;
+        String[][] mat = electraMethod(mainMas, C);
         System.out.println("Метод Электра:");
         printElec(mat, mainMas);
         printDomin(mat);
-        System.out.println("Метод Электра с ограничением ("+ 2.3 +"):");
-        String[][] ogr = electraMethod(mainMas, 2.3);
+        C = 2.3;
+        System.out.println("Метод Электра с ограничением ("+ C +"):");
+        String[][] ogr = electraMethod(mainMas, C);
         printElec(ogr, mainMas);
         printDomin(ogr);
     }

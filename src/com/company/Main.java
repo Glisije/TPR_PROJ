@@ -103,6 +103,7 @@ public class Main {
     }
 
 
+
     public static void main(String[] args) {
         ArrayList<Camera> parMas = makeArrayPar();
         new Pareto(parMas);
