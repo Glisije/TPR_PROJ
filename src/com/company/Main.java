@@ -2,6 +2,7 @@ package com.company;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class Main {
 
@@ -326,12 +327,194 @@ public class Main {
         System.out.println("W["+i+"] = "+String.format("%.3f",Wfinal[i]));
     }
 
+    public static void simpldimpl() {
+//        double[][] grnaitsi = {
+//                {0.15,0.2,1,0},
+//                {0.2,0.1,0,1}};
+//        double[] A1={}, A2={}, A3={}, A4={}, A0={};
+//        double[][] vectorsA = {A1, A2, A3, A3, A0};
+//        for (int i = 0; i< 5; i++) {
+//            for (int j = 0; j < 2; j++){
+//                vectorsA[i][j] = grnaitsi[i][j];
+//            }
+//
+//        }
+//
+//        for (int i = 0; i < 2; i++) {  //идём по строкам
+//            System.out.print("K"+ (i+1));
+//            for (int j = 0; j < 5; j++) {//идём по столбцам
+//                System.out.print("   " + String.format("%.3f",vectorsA[i][j]) + " "); //вывод элемента
+//            }
+//            System.out.println();//перенос строки ради визуального сохранения табличной формы
+//        }
+//        System.out.println();
+//
+//
+//        double x1, x2, x3, x4;
+//        double[][] startSimplTable;
+
+        double[][] iter0 = {{0.15, 0.2, 60},
+                {0.2, 0.1, 40},
+                {0, 0, 0}};
+        double[][] iter1 = {{0, 0, 0},
+                {0, 0, 0},
+                {0, 0, 0}};
+        double[][] iter2 = {{0, 0, 0},
+                {0, 0, 0},
+                {0, 0, 0}};
+        double[] fCB = {0, 0};
+        double[] fCI = {1.5, 1.2};
+        double fd1 = 0, fd2 = 0, fQ = 0;
+        for (int i = 0; i < fCB.length; i++) {
+            fd1 += fCB[i] * iter0[i][0];
+            fd2 += fCB[i] * iter0[i][1];
+            fQ += fCB[i] * iter0[i][2];
+        }
+        fd1 -= fCI[0];
+        fd2 -= fCI[1];
+        System.out.println(fQ + "  " + fd1 + "    " + fd2);
+        iter0[2][0] = fd1;
+        iter0[2][1] = fd2;
+        iter0[2][2] = fQ;
+        if (Math.abs(fd1) > Math.abs(fd2)) {
+            double temp = fCI[0];
+            double[] stemp = {0, 0};
+            for (int i = 0; i < 2; i++) {
+                stemp[i] = iter0[i][2] / iter0[i][0];
+            }
+            int minIndexHor = 0;
+            double min = stemp[0];
+            for (int k = 0; k < stemp.length; k++) {
+                for (int b = 0; b < stemp.length; b++) {
+                    if (stemp[b] < min) {
+                        min = stemp[b];
+                        minIndexHor = b;
+                    }
+                }
+                System.out.println(min +"  "+minIndexHor);
+            }
+            fCI[0] = fCB[minIndexHor];
+            fCB[minIndexHor] = temp;
+            for (int i = 0; i < 3; i++){
+                    iter1[i][0]=-(iter0[i][0]/iter0[minIndexHor][0]);//Заебись
+                    iter1[minIndexHor][i]=(iter0[minIndexHor][i]/iter0[minIndexHor][0]);
+            }
+            Scanner in = new Scanner(System.in);
+            System.out.println("Введите число обратное числу: "+ iter0[minIndexHor][0]);
+            iter1[minIndexHor][0] = in.nextDouble();
+
+            for (int i = 0; i < iter0.length; i++) {
+                for (int j = 0; j < iter0[0].length; j++) {
+                    System.out.print(" " + String.format("%.2f",iter0[i][j]) + " ");
+                }
+                System.out.println();
+            }
+            System.out.println();
+            for (int i = 0; i < iter1.length; i++) {
+                for (int j = 0; j < iter1[0].length; j++) {
+                    System.out.print(" " + String.format("%.2f",iter1[i][j]) + " ");
+                }
+                System.out.println();
+            }
+
+            for (int i = 0; i < iter1.length; i++) {
+                for (int j = 0; j < iter1[0].length; j++) {
+                    if (iter1[i][j] == 0) {
+                        if (i == 0 && j == 1) {
+                            iter1[i][j] = ((iter0[i][j] * iter0[minIndexHor][0]) - (iter0[0][0] * iter0[1][1])) / iter0[minIndexHor][0];//true
+                        } else if (i == 0 && j == 2) {
+                            iter1[i][j] = ((iter0[i][j] * iter0[minIndexHor][0]) - (iter0[0][0] * iter0[1][2])) / iter0[minIndexHor][0];
+                        } else if (i == 2 && j == 1) {
+                            iter1[i][j] = ((iter0[i][j] * iter0[minIndexHor][0]) - (iter0[2][0] * iter0[1][1])) / iter0[minIndexHor][0];
+                        } else if (i == 2 && j == 2) {
+                            iter1[i][j] = ((iter0[i][j] * iter0[minIndexHor][0]) - (iter0[2][0] * iter0[1][2])) / iter0[minIndexHor][0];
+                        }
+
+                    }
+                }
+            }
+            System.out.println();
+            for (int i = 0; i < iter1.length; i++) {
+                for (int j = 0; j < iter1[0].length; j++) {
+                    System.out.print(" " + String.format("%.2f",iter1[i][j]) + " ");
+                }
+                System.out.println();
+            }
+            int cont = 0;
+            for (int g = 0; g < iter1.length; g++) {
+                if (iter0[2][g]<0){
+                    ////////////////////////////////////////////////////////////////////////////////////////////
+                    // Поиск мнимума по базису
+                    double temp1 = fCI[g];
+                    double[] stemp1 = {0, 0};
+                    for (int i = 0; i < 2; i++) {
+                        stemp1[i] = iter1[i][2] / iter1[i][1];
+                    }
+                    int minIndexHor1 = 0;
+                    double min1 = stemp1[0];
+                    for (int k = 0; k < stemp1.length; k++) {
+                        for (int b = 0; b < stemp1.length; b++) {
+                            if (stemp1[b] < min) {
+                                min1 = stemp1[b];
+                                minIndexHor1 = b;
+                            }
+                        }
+                        System.out.println(min1 +"  "+minIndexHor1);
+                    }
+                    //Замена базиса
+                    fCI[g] = fCB[minIndexHor1];
+                    fCB[minIndexHor1] = temp1;
+                    //Рассчет строк и столбцов по разрешающему элементу
+                    for (int i = 0; i < 3; i++){
+                        iter2[i][g+1]=-(iter1[i][g+1]/iter1[minIndexHor1][g+1]);//Столбец
+                        iter2[minIndexHor1][i]=(iter1[minIndexHor1][i]/iter1[minIndexHor1][g+1]);//Строка
+                    }
+                    Scanner in1 = new Scanner(System.in);
+                    System.out.println("Введите число обратное числу: "+ iter1[minIndexHor1][g+1]);
+                    iter2[minIndexHor1][0] = in1.nextDouble();
+
+                    for (int i = 0; i < iter1.length; i++) {
+                        for (int j = 0; j < iter1[0].length; j++) {
+                            System.out.print(" " + String.format("%.2f",iter1[i][j]) + " ");
+                        }
+                        System.out.println();
+                    }
+                    System.out.println();
+                    for (int i = 0; i < iter2.length; i++) {
+                        for (int j = 0; j < iter2[0].length; j++) {
+                            System.out.print(" " + String.format("%.2f",iter2[i][j]) + " ");
+                        }
+                        System.out.println();
+                    }
+
+                    for (int i = 0; i < iter1.length; i++) {
+                        for (int j = 0; j < iter1[0].length; j++) {
+                            if (iter1[i][j] == 0) {
+                                if (i == 0 && j == 1) {
+                                    iter1[i][j] = ((iter0[i][j] * iter0[minIndexHor][0]) - (iter0[0][0] * iter0[1][1])) / iter0[minIndexHor][0];//true
+                                } else if (i == 0 && j == 2) {
+                                    iter1[i][j] = ((iter0[i][j] * iter0[minIndexHor][0]) - (iter0[0][0] * iter0[1][2])) / iter0[minIndexHor][0];
+                                } else if (i == 2 && j == 1) {
+                                    iter1[i][j] = ((iter0[i][j] * iter0[minIndexHor][0]) - (iter0[2][0] * iter0[1][1])) / iter0[minIndexHor][0];
+                                } else if (i == 2 && j == 2) {
+                                    iter1[i][j] = ((iter0[i][j] * iter0[minIndexHor][0]) - (iter0[2][0] * iter0[1][2])) / iter0[minIndexHor][0];
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
     public static void main(String[] args) {
 //        ArrayList<Camera> parMas = makeArrayPar();
 //        new Pareto(parMas);
 //        ArrayList<Camera> elMas = makeArrayEl(parMas);
 //        new Electra(elMas);
-        makeMAI();
-
+//        makeMAI();
+        simpldimpl();
     }
 }
