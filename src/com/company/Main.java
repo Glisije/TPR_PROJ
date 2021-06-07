@@ -311,7 +311,7 @@ public class Main {
             System.out.println("W[" + i + "] = " + String.format("%.3f", Wfinal[i]));
     }
 
-    public static void printSimpl(double[][] table, double[] fCI, double[] fCB){
+    public static void printSimpl(double[][] table, double[] fCI, double[] fCB) {
         for (int i = 0; i < table.length; i++) {
             for (int j = 0; j < table[0].length; j++) {
                 if (i == 0 && j == 0) {
@@ -344,6 +344,7 @@ public class Main {
         double[] fCB = {0, 0};
         double[] fCI = {1.5, 1.2};
         double fd1 = 0, fd2 = 0, fQ = 0;
+        //Подсчет первых дельт и Q
         for (int i = 0; i < fCB.length; i++) {
             fd1 += fCB[i] * mainTable[i][0];
             fd2 += fCB[i] * mainTable[i][1];
@@ -351,21 +352,24 @@ public class Main {
         }
         fd1 -= fCI[0];
         fd2 -= fCI[1];
-        System.out.println(fQ + "  " + fd1 + "    " + fd2);
         mainTable[2][0] = fd1;
         mainTable[2][1] = fd2;
         mainTable[2][2] = fQ;
 
-        while (mainTable[2][0] < 0 || mainTable[2][1]<0) {
-
-            int raz=0;
-
-            if (Math.abs(mainTable[2][0]) < 0) {
+        System.out.println("Изначальная таблица:");
+        printSimpl(mainTable, fCI, fCB);
+        //Проверка на отрицательные дельты
+        while (mainTable[2][0] < 0 || mainTable[2][1] < 0) {
+            System.out.println("Еще остались отрицательные дельты");
+            int raz = 0;
+            //Определние разрешающего столбца
+            if (Math.abs(mainTable[2][0]) > Math.abs(mainTable[2][0]) && mainTable[2][0] < 0) {
                 raz = 0;
-            } else if (mainTable[2][0] == 7.5) {
+            } else if (mainTable[2][0] > 0 && mainTable[2][1] < 0) {
                 raz = 1;
             }
 
+            //Поиск минимума по базису
             double temp = fCI[raz];
             double[] stemp = {0, 0};
             for (int i = 0; i < 2; i++) {
@@ -380,23 +384,26 @@ public class Main {
                         minIndexHor = b;
                     }
                 }
-                System.out.println(min + "  " + minIndexHor);
             }
 
-            //Выше должно работать
-            fCI[0] = fCB[minIndexHor];
+            //Замена базиса
+            fCI[raz] = fCB[minIndexHor];
             fCB[minIndexHor] = temp;
-            //Рассчет строк и столбцов по разрешающему элементу
 
+            //Рассчет строк и столбцов по разрешающему элементу
             for (int i = 0; i < 3; i++) {
                 tempTable[i][raz] = -(mainTable[i][raz] / mainTable[minIndexHor][raz]);//Заебись
                 tempTable[minIndexHor][i] = (mainTable[minIndexHor][i] / mainTable[minIndexHor][raz]);
             }
             Scanner in = new Scanner(System.in);
-            System.out.println("Введите число обратное числу: " + mainTable[minIndexHor][raz]);
+            System.out.print("Введите число обратное числу " + String.format("%.2f", mainTable[minIndexHor][raz]) + " : ");
             tempTable[minIndexHor][raz] = in.nextDouble();
 
+            System.out.println();
+            System.out.println(raz + " итерация таблицы (только разрешающие столбец и строка):");
+            printSimpl(tempTable, fCI, fCB);
 
+            //Рассчет по правилу прямоугольника
             if (raz == 0) {
 
                 for (int i = 0; i < tempTable.length; i++) {
@@ -415,169 +422,45 @@ public class Main {
                         }
                     }
                 }
-
-                System.out.println("//////////////");
-                printSimpl(tempTable, fCI, fCB);
-
-
+                //Замена главной и временной таблиц
                 mainTable = tempTable;
                 tempTable = new double[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
 
-            }
-                else if (raz == 1){
-                    for (int i = 0; i < tempTable.length; i++) {
-                        for (int j = 0; j < tempTable[0].length; j++) {
-                            if (tempTable[i][j] == 0) {
-                                if (i == 1 && j == 0) {
-                                    tempTable[i][j] = ((mainTable[i][j] * mainTable[minIndexHor][1]) - (mainTable[0][0] * mainTable[1][1])) / mainTable[minIndexHor][1];//true
-                                } else if (i == 2 && j == 0) {
-                                    tempTable[i][j] = ((mainTable[i][j] * mainTable[minIndexHor][1]) - (mainTable[0][0] * mainTable[2][1])) / mainTable[minIndexHor][1];
-                                } else if (i == 1 && j == 2) {
-                                    tempTable[i][j] = ((mainTable[i][j] * mainTable[minIndexHor][1]) - (mainTable[0][2] * mainTable[1][1])) / mainTable[minIndexHor][1];
-                                } else if (i == 2 && j == 2) {
-                                    tempTable[i][j] = ((mainTable[i][j] * mainTable[minIndexHor][1]) - (mainTable[0][2] * mainTable[2][1])) / mainTable[minIndexHor][1];
-                                }
+                System.out.println(raz + " итерация таблицы:");
+                printSimpl(mainTable, fCI, fCB);
 
+            }
+            //Рассчет по правилу прямоугольника
+            else if (raz == 1) {
+                for (int i = 0; i < tempTable.length; i++) {
+                    for (int j = 0; j < tempTable[0].length; j++) {
+                        if (tempTable[i][j] == 0) {
+                            if (i == 1 && j == 0) {
+                                tempTable[i][j] = ((mainTable[i][j] * mainTable[minIndexHor][1]) - (mainTable[0][0] * mainTable[1][1])) / mainTable[minIndexHor][1];//true
+                            } else if (i == 2 && j == 0) {
+                                tempTable[i][j] = ((mainTable[i][j] * mainTable[minIndexHor][1]) - (mainTable[0][0] * mainTable[2][1])) / mainTable[minIndexHor][1];
+                            } else if (i == 1 && j == 2) {
+                                tempTable[i][j] = ((mainTable[i][j] * mainTable[minIndexHor][1]) - (mainTable[0][2] * mainTable[1][1])) / mainTable[minIndexHor][1];
+                            } else if (i == 2 && j == 2) {
+                                tempTable[i][j] = ((mainTable[i][j] * mainTable[minIndexHor][1]) - (mainTable[0][2] * mainTable[2][1])) / mainTable[minIndexHor][1];
                             }
+
                         }
                     }
-                    printSimpl(tempTable, fCI, fCB);
-
-                    mainTable = tempTable;
-
-//                    double temp2 = fCI[g + 1];
-//                    fCI[g + 1] = fCB[minIndexHor1];
-//                    fCB[minIndexHor1] = temp2;
-//                    System.out.println(fCB[0] + "  " + fCB[1] + "  " + fCI[0] + "  " + fCI[1]);
-//                    double Fmax = fCB[0] * tempTable[0][2] + fCB[1] * tempTable[1][2];
-//                    System.out.println(Fmax);
-
-                    //}
                 }
+                //Замена главной и временной таблиц
+                mainTable = tempTable;
+                tempTable = new double[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+
+                System.out.println(raz + " итерация таблицы:");
+                printSimpl(mainTable, fCI, fCB);
             }
+        }
+        //Финальный вывод
+        System.out.println("Все дельты положительны");
         System.out.println("x1 = " + String.format("%.3f", mainTable[0][2]));
         System.out.println("x2 = " + String.format("%.3f", mainTable[1][2]));
         System.out.println("Прибыль равна = " + (fCB[0] * mainTable[0][2] + fCB[1] * mainTable[1][2]));
-        }
-
-
-    class Simplex {
-        Simplex() {
-        }
-
-        public double[] KoefC = {3, 5};
-        public double[] KoefB = {0, 0, 0, 0};
-        public int[] C = {1, 2};
-        public int[] B = {3, 4, 5, 6};
-        public double[] delta = {-1, -1};
-        public double[][] mainTable = {{10, 70, 570}, {20, 50, 420}, {300, 400, 5000}, {200, 100, 3400}};
-        public double[][] tmpMainTable = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
-
-        public void start() {
-            int r = 0, s = 0;
-            while (true) {
-                double scale = Math.pow(10, 2);
-                double[] tmpFinalVector = new double[4];
-                System.out.println("\t\t\t\t" + KoefC[0] + "\t\t" + KoefC[1]);
-                for (int i = 0; i < 4; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        if (i == 0 && j == 0) {
-                            System.out.println("\t\t\t\t" + "x[" + C[0] + "]\t" + "x[" + C[1] + "]" + "\tA0");
-                        }
-                        if (j == 0) {
-                            System.out.print(KoefB[i] + "\t\tx[" + B[i] + "]\t");
-                        }
-                        System.out.print(Math.ceil(mainTable[i][j] * scale) / scale + "\t");
-                        if (j == 2) {
-                            System.out.println();
-                        }
-                    }
-                }
-                //подсчёт дельт
-                delta[0] = (mainTable[0][0] * KoefB[0] + mainTable[1][0] * KoefB[1] + mainTable[2][0] * KoefB[2] + mainTable[3][0] * KoefB[3]) - KoefC[0];
-                delta[1] = (mainTable[0][1] * KoefB[0] + mainTable[1][1] * KoefB[1] + mainTable[2][1] * KoefB[2] + mainTable[3][1] * KoefB[3]) - KoefC[1];
-                System.out.println("\t\tf\t\t" + Math.ceil(delta[0] * scale) / scale + "\t" + Math.ceil(delta[1] * scale) / scale);
-                if (delta[0] > 0 && delta[1] > 0) {
-                    System.out.println("x1 = " + Math.ceil(mainTable[1][2] * scale) / scale);
-                    System.out.println("x2 = " + Math.ceil(mainTable[0][2] * scale) / scale);
-                    System.out.println("Прибыль равна = " + ((3 * mainTable[1][2]) + (5 * mainTable[0][2])));
-                    break;
-                }
-                //Сравнение дельт
-                if (delta[0] < 0 || delta[1] < 0) {
-                    if (delta[0] < 0) {
-                        s = 0;
-                    }
-                    if (delta[1] < 0) {
-
-                        s = 1;
-
-                    }
-                    if (delta[0] < 0 && delta[1] < 0) {
-                        double newDelta1 = -delta[0];
-                        double newDelta2 = -delta[1];
-                        if (newDelta1 > newDelta2) {
-                            s = 0;
-                        } else {
-                            s = 1;
-                        }
-                    }
-                }
-                double tempMin = 100000;
-                for (int i = 0; i < tmpFinalVector.length; i++) {
-                    tmpFinalVector[i] = mainTable[i][2] / mainTable[i][s];
-                    if (tempMin > tmpFinalVector[i] && tmpFinalVector[i] > 0) {
-                        tempMin = tmpFinalVector[i];
-                        r = i;
-                    }
-                }
-                System.out.println("Разрешающая строка : " + r + "\nРазрешающий столбец : " + s + "\nРазрешающий элемент : " + Math.ceil(mainTable[r][s] * scale) / scale);
-                //преобразование разрешающих стобцов и строк
-                for (int i = 0; i < 4; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        tmpMainTable[i][j] = mainTable[i][j];
-                    }
-                }
-                double element = mainTable[r][s];//Выделение разрешающего элемента
-                for (int i = 0; i < 4; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        if (i == r && j == s) {
-                            mainTable[i][j] = 1 / mainTable[i][j];
-                            continue;
-                        }
-                        if (i == r) {
-                            mainTable[i][j] = mainTable[i][j] / element;
-                        }
-                        if (j == s) {
-                            mainTable[i][j] = -mainTable[i][j] / element;
-                        }
-                    }
-                }
-                //замена коефициентов базисных и небазисных переменных
-                double tempKoef;
-                tempKoef = KoefC[s];
-                KoefC[s] = KoefB[r];
-                KoefB[r] = tempKoef;
-                //замена базисных и небазисных переменных
-                int tempC;
-                tempC = C[s];
-                C[s] = B[r];
-                B[r] = tempC;
-                //Правило прямоугольника внутри главной таблицы
-                for (int i = 0; i < 4; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        if (i != r && j != s) {
-                            mainTable[i][j] = ((tmpMainTable[i][j] * element) - (tmpMainTable[r][j] * tmpMainTable[i][s])) / element;
-                        }
-                    }
-                }
-                for (int i = 0; i < 4; i++) {
-                    for (int j = 0; j < 2; j++) {
-                        tmpMainTable[i][j] = mainTable[i][j];
-                    }
-                }
-            }
-        }
     }
 
     public static void main(String[] args) {
@@ -586,10 +469,7 @@ public class Main {
 //        ArrayList<Camera> elMas = makeArrayEl(parMas);
 //        new Electra(elMas);
 //        makeMAI();
-        //makeSimpl();
         simpldimpl();
 
-//        Simplex simplex=new Simplex();
-//        simplex.start();
     }
 }
